@@ -6,9 +6,9 @@ public class InteractableItem : MonoBehaviour
     [Header("Item Settings")]
     public string itemName = "Aktivoitava kohde";
     public AudioClip interactSound;
-    public bool destroyOnInteract = true;  
+    public bool destroyOnInteract = true;
 
-    public InventoryItemData itemData;  
+    public InventoryItemData itemData;
 
     [Header("Activation Events")]
     public UnityEvent onInteractAction;
@@ -17,14 +17,13 @@ public class InteractableItem : MonoBehaviour
 
     public void Interact(Player player)
     {
-        if (isAlreadyInteracted) return;
+        if (destroyOnInteract && isAlreadyInteracted) return;
         isAlreadyInteracted = true;
 
         if (interactSound != null)
         {
             AudioSource.PlayClipAtPoint(interactSound, transform.position, 1f);
         }
-
 
         if (itemData != null && player != null)
         {
@@ -40,10 +39,6 @@ public class InteractableItem : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        else
-        {
-            Collider col = GetComponent<Collider>();
-            if (col != null) col.enabled = false;
-        }
+
     }
 }
