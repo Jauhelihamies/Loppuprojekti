@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5811099318433601445}
   - component: {fileID: 6765723144459436372}
   - component: {fileID: 8905983053118147151}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Pink
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,9 +100,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6124597569136278052}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 0.3
   m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_AngularDamping: 0.02
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}

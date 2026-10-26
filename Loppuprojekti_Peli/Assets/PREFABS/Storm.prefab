@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8242395977320736040}
   - component: {fileID: 4531938046624769841}
   - component: {fileID: 132906710076861956}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Storm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,9 +100,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893692926101275649}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 0.3
   m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_AngularDamping: 0.02
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
