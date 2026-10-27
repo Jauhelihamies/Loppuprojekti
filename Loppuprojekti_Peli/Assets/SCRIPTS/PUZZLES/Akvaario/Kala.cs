@@ -2,5 +2,6 @@ using UnityEngine;
 
 public class Kala : MonoBehaviour
 {
-    private int paino;
+    [SerializeField] int paino;
+    public int Paino { get => paino; private set => paino = value; }
 }
