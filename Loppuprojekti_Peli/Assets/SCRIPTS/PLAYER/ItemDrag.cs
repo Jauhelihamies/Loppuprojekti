@@ -81,12 +81,12 @@ public class PhysicsDragAndScroll : MonoBehaviour
                 targetRigidbody = rb;
 
                 // KORJATTU: K‰ytet‰‰n .drag-muuttujaa linearDragin sijaan
-                originalDrag = targetRigidbody.drag;
-                originalAngularDrag = targetRigidbody.angularDrag;
+                originalDrag = targetRigidbody.linearDamping;
+                originalAngularDrag = targetRigidbody.angularDamping;
 
                 targetRigidbody.useGravity = false;
-                targetRigidbody.drag = 10f; // Est‰‰ liiallisen heilahtelun
-                targetRigidbody.angularDrag = 5f;
+                targetRigidbody.linearDamping = 10f; // Est‰‰ liiallisen heilahtelun
+                targetRigidbody.angularDamping = 5f;
 
                 // Lasketaan aloituset‰isyys
                 currentDistance = Vector3.Distance(mainCamera.transform.position, targetRigidbody.position);
@@ -101,8 +101,8 @@ public class PhysicsDragAndScroll : MonoBehaviour
             // Palautetaan objektin alkuper‰iset fysiikka-asetukset
             // KORJATTU: K‰ytet‰‰n .drag-muuttujaa linearDragin sijaan
             targetRigidbody.useGravity = true;
-            targetRigidbody.drag = originalDrag;
-            targetRigidbody.angularDrag = originalAngularDrag;
+            targetRigidbody.linearDamping = originalDrag;
+            targetRigidbody.angularDamping = originalAngularDrag;
 
             targetRigidbody = null;
         }
