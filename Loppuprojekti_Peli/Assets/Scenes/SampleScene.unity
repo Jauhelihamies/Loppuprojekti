@@ -146,30 +146,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -35733232554804941, guid: 2bff386b11b41564db25abe9aed31652, type: 3}
---- !u!1 &330585543 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6107961937077484833, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
-  m_PrefabInstance: {fileID: 6431727700172218422}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &330585548
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 330585543}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16da87b410adf6241a6af199f18448bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObjectDragger
-  scrollSpeed: 100
-  minDistance: 2
-  maxDistance: 6
-  dragForce: 20
-  draggableLayer:
-    serializedVersion: 2
-    m_Bits: 64
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -1171,9 +1147,33 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2753824119739724577, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
-      propertyPath: interactRange
-      value: 2
+      propertyPath: activeSlotColor.a
+      value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2753824119739724577, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
+      propertyPath: activeSlotColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2753824119739724577, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
+      propertyPath: activeSlotColor.g
+      value: 0.89218324
+      objectReference: {fileID: 0}
+    - target: {fileID: 2753824119739724577, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
+      propertyPath: activeSlotColor.r
+      value: 0.6698113
+      objectReference: {fileID: 0}
+    - target: {fileID: 4846429585221476020, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 97fe4b1d3cb43f84e83f754bc2200b8a, type: 3}
+    - target: {fileID: 6736871060703462306, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 97fe4b1d3cb43f84e83f754bc2200b8a, type: 3}
+    - target: {fileID: 7508599464113140048, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 30bb3dfca94d94a46a475a1be16a0ac1, type: 3}
     - target: {fileID: 7759714358454798792, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
       propertyPath: m_LocalPosition.x
       value: -8.130007
@@ -1214,6 +1214,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8443522939179206555, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 97fe4b1d3cb43f84e83f754bc2200b8a, type: 3}
+    - target: {fileID: 8738435528694556021, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 940
+      objectReference: {fileID: 0}
     - target: {fileID: 9040284152905713979, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
       propertyPath: m_Name
       value: PLAYER
@@ -1221,10 +1229,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6107961937077484833, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 330585548}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3873c1f295811864b87cc017694e6a1b, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
