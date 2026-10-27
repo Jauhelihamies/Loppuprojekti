@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class AkvaarioScript : MonoBehaviour
+public class AkvaarioScript : MonoBehaviour, IPuzzle
 {
     private int winPaino = 20;
     [SerializeField] private int nytPaino = 0;
@@ -64,7 +64,7 @@ public class AkvaarioScript : MonoBehaviour
     /// Kertoo onko tämä puzzle ratkaistu.
     /// </summary>
     /// <returns></returns>
-    private bool Ratkaistu()
+    public bool Ratkaistu()
     {
         if (nytPaino == winPaino)
         {
