@@ -437,6 +437,7 @@ GameObject:
   - component: {fileID: 5629707842644440228}
   - component: {fileID: 2773149861357855105}
   - component: {fileID: 6964942776295064168}
+  - component: {fileID: 5836767743121052056}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -562,6 +563,25 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &5836767743121052056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6107961937077484833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16da87b410adf6241a6af199f18448bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectDragger
+  scrollSpeed: 100
+  minDistance: 2
+  maxDistance: 6
+  dragForce: 20
+  draggableLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &6215318904909986594
 GameObject:
   m_ObjectHideFlags: 0
@@ -1161,7 +1181,7 @@ MonoBehaviour:
   cameraTransform: {fileID: 2581251344686987532}
   mouseSensitivity: 0.05
   upDownRange: 85
-  interactRange: 4
+  interactRange: 2
   interactableLayer:
     serializedVersion: 2
     m_Bits: 8
