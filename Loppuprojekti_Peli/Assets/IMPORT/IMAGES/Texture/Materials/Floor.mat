@@ -27,6 +27,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Fresnel_Power: 0.31
+    - _QueueControl: 0
     - _Smoothness: 0.26
     m_Colors:
     - _BaseColor: {r: 0.13207549, g: 0.13207549, b: 0.13207549, a: 1}
