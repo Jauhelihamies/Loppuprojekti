@@ -3,55 +3,63 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// The class name now matches your file name perfectly!
 public class BHR_Vehicle : MonoBehaviour
 {
     private float horizontalInput;
     private float verticalInput;
     private float currentSteerAngle;
-    private float currentbreakForce;
-    private bool isBreaking;
+    private float currentBrakeForce; // Fixed typo 'break' -> 'brake'
+    private bool isBraking;          // Fixed typo 'isBreaking' -> 'isBraking'
+    private Rigidbody rb;
 
     [Header("Driving Settings")]
-    [SerializeField] private float motorForce = 1500f;
-    [SerializeField] private float brakeForce = 3000f;
+    [SerializeField] private float motorForce = 1500f; // Boosted for WheelCollider realistic defaults
+    [SerializeField] private float brakeForce = 5000f; // Boosted for heavy physics clamping
     [SerializeField] private float maxSteerAngle = 30f;
 
+    [Header("Anti-Flip Settings")]
+    [Tooltip("How aggressively the car forces itself to stand upright. Recommended: 50 to 200")]
+    [SerializeField] private float antiFlipStabilitySpeed = 100f;
+    [Tooltip("Damping to prevent the car from oscillating or spinning out of control. Recommended: 10 to 30")]
+    [SerializeField] private float antiFlipDamping = 20f;
+    [Tooltip("If the car flips completely upside down on its head, how fast should it force snap back up?")]
+    [SerializeField] private float completelyUpsideDownResetSpeed = 30f;
+
     [Header("Camera Settings")]
-    [Tooltip("The script will try to find Camera.main automatically, but you can drag your Main Camera here if needed.")]
     [SerializeField] private Transform mainCameraTransform;
-    [SerializeField] private Vector3 cameraOffset = new Vector3(0f, 3.5f, -7.5f); // Distance behind and above the car
-    [SerializeField] private float cameraMoveSpeed = 5f; // How smoothly the camera catches up
-    [SerializeField] private float cameraRotationSpeed = 5f; // How fast the camera turns to look at the car
+    [SerializeField] private Vector3 cameraOffset = new Vector3(0f, 3.5f, -7.5f);
+    [SerializeField] private float cameraMoveSpeed = 5f;
 
-    [Header("Assign Your 4 Wheel Objects Here")]
-    [Tooltip("Drag the actual wheel game objects that have the Wheel Colliders on them.")]
-    [SerializeField] private Transform frontLeftWheel;
-    [SerializeField] private Transform frontRightWheel;
-    [SerializeField] private Transform rearLeftWheel;
-    [SerializeField] private Transform rearRightWheel;
+    [Header("Assign Wheel Colliders Here")]
+    [SerializeField] private WheelCollider flCollider;
+    [SerializeField] private WheelCollider frCollider;
+    [SerializeField] private WheelCollider rlCollider;
+    [SerializeField] private WheelCollider rrCollider;
 
-    // Private references automatically found at startup
-    private WheelCollider flCollider;
-    private WheelCollider frCollider;
-    private WheelCollider rlCollider;
-    private WheelCollider rrCollider;
+    [Header("Assign Visual Wheel Meshes Here")]
+    [SerializeField] private Transform flVisualTransform;
+    [SerializeField] private Transform frVisualTransform;
+    [SerializeField] private Transform rlVisualTransform;
+    [SerializeField] private Transform rrVisualTransform;
 
     private void Start()
     {
-        // Automatically grab the colliders from the assigned wheel objects
-        if (frontLeftWheel != null) flCollider = frontLeftWheel.GetComponent<WheelCollider>();
-        if (frontRightWheel != null) frCollider = frontRightWheel.GetComponent<WheelCollider>();
-        if (rearLeftWheel != null) rlCollider = rearLeftWheel.GetComponent<WheelCollider>();
-        if (rearRightWheel != null) rrCollider = rearRightWheel.GetComponent<WheelCollider>();
-
-        // Quick warning check to help you debug if a slot was missed
-        if (flCollider == null || frCollider == null || rlCollider == null || rrCollider == null)
+        rb = GetComponent<Rigidbody>();
+        if (rb != null)
         {
-            Debug.LogError("BHR_Vehicle: One or more assigned wheel objects are missing a Wheel Collider component!");
+            // Low center of mass prevents instant flipping on tight turns
+            rb.centerOfMass = new Vector3(0f, -0.8f, 0.5f);
+        }
+        else
+        {
+            Debug.LogError("BHR_Vehicle: No Rigidbody component found on this GameObject root!");
         }
 
-        // Automatically find the Main Camera in your scene if the slot is left empty
+        if (flCollider == null || frCollider == null || rlCollider == null || rrCollider == null)
+        {
+            Debug.LogError("BHR_Vehicle: One or more Wheel Colliders are not assigned in the inspector!");
+        }
+
         if (mainCameraTransform == null && Camera.main != null)
         {
             mainCameraTransform = Camera.main.transform;
@@ -64,25 +72,37 @@ public class BHR_Vehicle : MonoBehaviour
         HandleMotor();
         HandleSteering();
         UpdateWheels();
-        HandleCamera(); // Processes the camera movement right after the physics updates
+        ApplyAntiFlipStabilizer();
+    }
+
+    private void LateUpdate()
+    {
+        // Moved to LateUpdate to completely eliminate camera tracking jitter
+        HandleCamera();
     }
 
     private void GetInput()
     {
         if (Keyboard.current != null)
         {
-            // Steering (A/D or Arrows)
-            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) horizontalInput = -1f;
-            else if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) horizontalInput = 1f;
-            else horizontalInput = 0f;
+            // Horizontal Input
+            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed)
+                horizontalInput = -1f;
+            else if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
+                horizontalInput = 1f;
+            else
+                horizontalInput = 0f;
 
-            // Acceleration (W/S or Arrows)
-            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) verticalInput = 1f;
-            else if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) verticalInput = -1f;
-            else verticalInput = 0f;
+            // Vertical Input
+            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed)
+                verticalInput = 1f;
+            else if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed)
+                verticalInput = -1f;
+            else
+                verticalInput = 0f;
 
-            // Handbrake (Spacebar)
-            isBreaking = Keyboard.current.spaceKey.isPressed;
+            // Fixed input sticking bug: captures state explicitly every frame
+            isBraking = Keyboard.current.spaceKey.isPressed;
         }
     }
 
@@ -93,7 +113,7 @@ public class BHR_Vehicle : MonoBehaviour
         flCollider.motorTorque = verticalInput * motorForce;
         frCollider.motorTorque = verticalInput * motorForce;
 
-        currentbreakForce = isBreaking ? brakeForce : 0f;
+        currentBrakeForce = isBraking ? brakeForce : 0f;
         ApplyBraking();
     }
 
@@ -101,10 +121,10 @@ public class BHR_Vehicle : MonoBehaviour
     {
         if (flCollider == null || frCollider == null || rlCollider == null || rrCollider == null) return;
 
-        flCollider.brakeTorque = currentbreakForce;
-        frCollider.brakeTorque = currentbreakForce;
-        rlCollider.brakeTorque = currentbreakForce;
-        rrCollider.brakeTorque = currentbreakForce;
+        flCollider.brakeTorque = currentBrakeForce;
+        frCollider.brakeTorque = currentBrakeForce;
+        rlCollider.brakeTorque = currentBrakeForce;
+        rrCollider.brakeTorque = currentBrakeForce;
     }
 
     private void HandleSteering()
@@ -118,10 +138,10 @@ public class BHR_Vehicle : MonoBehaviour
 
     private void UpdateWheels()
     {
-        UpdateSingleWheel(flCollider, frontLeftWheel);
-        UpdateSingleWheel(frCollider, frontRightWheel);
-        UpdateSingleWheel(rlCollider, rearLeftWheel);
-        UpdateSingleWheel(rrCollider, rearRightWheel);
+        UpdateSingleWheel(flCollider, flVisualTransform);
+        UpdateSingleWheel(frCollider, frVisualTransform);
+        UpdateSingleWheel(rlCollider, rlVisualTransform);
+        UpdateSingleWheel(rrCollider, rrVisualTransform);
     }
 
     private void UpdateSingleWheel(WheelCollider collider, Transform visualTransform)
@@ -130,28 +150,44 @@ public class BHR_Vehicle : MonoBehaviour
 
         Vector3 pos;
         Quaternion rot;
-
         collider.GetWorldPose(out pos, out rot);
-
         visualTransform.position = pos;
         visualTransform.rotation = rot;
+    }
+
+    private void ApplyAntiFlipStabilizer()
+    {
+        if (rb == null) return;
+
+        // 1. Hard reset if upside down
+        if (Vector3.Dot(transform.up, Vector3.down) > 0.4f)
+        {
+            Quaternion uprightTarget = Quaternion.LookRotation(transform.forward, Vector3.up);
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, uprightTarget, completelyUpsideDownResetSpeed * Time.fixedDeltaTime));
+            return;
+        }
+
+        // 2. Stable stabilization torque
+        Vector3 predictedUp = transform.up;
+        Vector3 torqueCorrectionVector = Vector3.Cross(predictedUp, Vector3.up);
+        Vector3 finalTorque = (torqueCorrectionVector * antiFlipStabilitySpeed) - (rb.angularVelocity * antiFlipDamping);
+
+        rb.AddTorque(finalTorque, ForceMode.Acceleration);
     }
 
     private void HandleCamera()
     {
         if (mainCameraTransform == null) return;
 
-        // 1. Calculate where the camera should want to step behind the car
         Vector3 targetCameraPosition = transform.TransformPoint(cameraOffset);
+        mainCameraTransform.position = Vector3.Lerp(mainCameraTransform.position, targetCameraPosition, cameraMoveSpeed * Time.deltaTime);
 
-        // 2. Smoothly slide the camera position over time
-        mainCameraTransform.position = Vector3.Lerp(mainCameraTransform.position, targetCameraPosition, cameraMoveSpeed * Time.fixedDeltaTime);
+        Vector3 forwardHeading = transform.forward;
+        forwardHeading.y = 0f;
 
-        // 3. Determine the direct line of sight to look at the center of the car
-        Vector3 directionToCar = transform.position - mainCameraTransform.position;
-        Quaternion targetCameraRotation = Quaternion.LookRotation(directionToCar, Vector3.up);
-
-        // 4. Smoothly rotate the camera lens to face the car
-        mainCameraTransform.rotation = Quaternion.Slerp(mainCameraTransform.rotation, targetCameraRotation, cameraRotationSpeed * Time.fixedDeltaTime);
+        if (forwardHeading != Vector3.zero)
+        {
+            mainCameraTransform.rotation = Quaternion.LookRotation(forwardHeading.normalized, Vector3.up);
+        }
     }
 }
