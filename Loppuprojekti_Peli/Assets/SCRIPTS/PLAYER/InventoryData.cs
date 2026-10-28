@@ -8,7 +8,7 @@ public class InventoryItemData : ScriptableObject
     public AudioClip useSound;          
 
 
-    public void UseItem(Player player)
+    public virtual void UseItem(Player player)
     {
         Debug.Log($"{player.name} käytti esinettä: {itemName}");
 
