@@ -1,12 +1,16 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class AkvaarioScript : MonoBehaviour, IPuzzle
+public class AkvaarioScript : IPuzzle
 {
     private int winPaino = 20;
     [SerializeField] private int nytPaino = 0;
     private List<Kala> kalat = new List<Kala>();
+
+    public UnityAction SolvedAction;
+    public UnityAction UnsolvedAction;
 
 
     private void OnTriggerEnter(Collider other)
@@ -15,6 +19,10 @@ public class AkvaarioScript : MonoBehaviour, IPuzzle
         {
             Lisaa(kala);
             Laske();
+            if (Ratkaistu())
+            { SolvedAction.Invoke();}
+            else 
+            { UnsolvedAction.Invoke();}
         }
     }
 
@@ -24,6 +32,10 @@ public class AkvaarioScript : MonoBehaviour, IPuzzle
         {
             Poista(kala);
             Laske();
+            if (Ratkaistu())
+            { SolvedAction.Invoke(); }
+            else 
+            { UnsolvedAction.Invoke(); }
         }
     }
 
@@ -56,7 +68,6 @@ public class AkvaarioScript : MonoBehaviour, IPuzzle
         for (int i = 0; i < kalat.Count; i++)
         {
             nytPaino += kalat[i].Paino;
-            Debug.Log(kalat[i]);
         }
     }
 
@@ -64,7 +75,7 @@ public class AkvaarioScript : MonoBehaviour, IPuzzle
     /// Kertoo onko tämä puzzle ratkaistu.
     /// </summary>
     /// <returns></returns>
-    public bool Ratkaistu()
+    public override bool Ratkaistu()
     {
         if (nytPaino == winPaino)
         {
