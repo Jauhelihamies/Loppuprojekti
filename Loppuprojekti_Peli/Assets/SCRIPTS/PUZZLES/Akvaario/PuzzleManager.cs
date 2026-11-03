@@ -19,7 +19,7 @@ public class PuzzleManager : MonoBehaviour
         }
         foreach (PuzzleScript p in puzzleScripts)
         {
-            //lis‰‰ eventin
+            //Kytke tapahtumaan funktio
             p.SolvedAllAction += PuzzleTehty;
         }
     }

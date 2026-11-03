@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -361,6 +362,20 @@ public class Player : MonoBehaviour
         {
             Debug.Log("K‰si on tyhj‰, ei mit‰‰n k‰ytett‰v‰‰.");
         }
+    }
+
+    public InventoryItemData? GetItemWithItemName(string tag)
+    {
+        foreach (InventoryItemData item in inventory)
+        {
+            if (item!= null && item.itemName == tag)
+            {
+                inventory[Array.IndexOf(inventory, item)] = null;
+                UpdateInventoryUI();
+                return item;
+            }
+        }
+        return null;
     }
     private void SwitchSlot(int newSlot)
     {
