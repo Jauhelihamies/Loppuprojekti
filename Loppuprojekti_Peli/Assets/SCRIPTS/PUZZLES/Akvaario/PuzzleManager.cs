@@ -19,10 +19,14 @@ public class PuzzleManager : MonoBehaviour
         }
         foreach (PuzzleScript p in puzzleScripts)
         {
+            //lis‰‰ eventin
             p.SolvedAllAction += PuzzleTehty;
         }
     }
 
+    /// <summary>
+    /// Laukaisee, jos puzzle skripti on ratkaistu.
+    /// </summary>
     private void PuzzleTehty()
     {
         Debug.Log("Manager sai viestin!");

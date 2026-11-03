@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Kala, jota k‰ytet‰‰n akvaario puzzlessa. Scripti kertoo vain painon.
+/// </summary>
 public class Kala : MonoBehaviour
 {
     [SerializeField] int paino;

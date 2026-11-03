@@ -13,6 +13,10 @@ public class AkvaarioScript : IPuzzle
     public UnityAction UnsolvedAction;
 
 
+    /// <summary>
+    /// Tarkistaa ja lis‰‰ kalan akvaarioon.
+    /// </summary>
+    /// <param name="other">Toimii vaan, jos komponenttiin on yhdistetty Kala skripti</param>
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.TryGetComponent(out Kala kala))
@@ -26,6 +30,10 @@ public class AkvaarioScript : IPuzzle
         }
     }
 
+    /// <summary>
+    /// Tarkistaa ja poistaa kalan akvaariosta.
+    /// </summary>
+    /// <param name="other">Toimii vaan, jos komponentiin on yhdistetty Kala skripti</param>
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject.TryGetComponent(out Kala kala))
@@ -60,7 +68,7 @@ public class AkvaarioScript : IPuzzle
     }
 
     /// <summary>
-    /// Laskee kalojen summan yhteen
+    /// Laskee kalojen summan/painon yhteen.
     /// </summary>
     private void Laske()
     {
@@ -72,7 +80,7 @@ public class AkvaarioScript : IPuzzle
     }
 
     /// <summary>
-    /// Kertoo onko t‰m‰ puzzle ratkaistu.
+    /// Kertoo, onko t‰m‰ puzzle ratkaistu.
     /// </summary>
     /// <returns></returns>
     public override bool Ratkaistu()
