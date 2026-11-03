@@ -229,7 +229,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 97fe4b1d3cb43f84e83f754bc2200b8a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 35b3cf92a6873a74a995b35671ea1c3d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -577,8 +577,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectDragger
   scrollSpeed: 100
   minDistance: 2
-  maxDistance: 6
-  dragForce: 20
+  maxDistance: 8
+  dragForce: 15
   draggableLayer:
     serializedVersion: 2
     m_Bits: 64
