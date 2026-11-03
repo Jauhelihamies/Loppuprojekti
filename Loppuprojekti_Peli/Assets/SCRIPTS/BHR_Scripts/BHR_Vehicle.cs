@@ -8,13 +8,14 @@ public class BHR_Vehicle : MonoBehaviour
     private float horizontalInput;
     private float verticalInput;
     private float currentSteerAngle;
-    private float currentBrakeForce; // Fixed typo 'break' -> 'brake'
-    private bool isBraking;          // Fixed typo 'isBreaking' -> 'isBraking'
+    private float currentBrakeForce;
+    private bool isBraking;
     private Rigidbody rb;
 
     [Header("Driving Settings")]
-    [SerializeField] private float motorForce = 1500f; // Boosted for WheelCollider realistic defaults
-    [SerializeField] private float brakeForce = 5000f; // Boosted for heavy physics clamping
+    [Tooltip("For a 1.4 wheel radius, try values between 15000 and 30000")]
+    [SerializeField] private float motorForce = 20000f;
+    [SerializeField] private float brakeForce = 30000f;
     [SerializeField] private float maxSteerAngle = 30f;
 
     [Header("Anti-Flip Settings")]
@@ -44,6 +45,9 @@ public class BHR_Vehicle : MonoBehaviour
 
     private void Start()
     {
+        // ADDED: Forces high-precision physics calculations to prevent massive wheel glitching
+        Physics.defaultMaxDepenetrationVelocity = 100f;
+
         rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -77,7 +81,7 @@ public class BHR_Vehicle : MonoBehaviour
 
     private void LateUpdate()
     {
-        // Moved to LateUpdate to completely eliminate camera tracking jitter
+        // Keeps the camera track perfectly smooth without stuttering
         HandleCamera();
     }
 
@@ -108,10 +112,13 @@ public class BHR_Vehicle : MonoBehaviour
 
     private void HandleMotor()
     {
-        if (flCollider == null || frCollider == null) return;
+        if (flCollider == null || frCollider == null || rlCollider == null || rrCollider == null) return;
 
+        // MODIFIED: Enabled All-Wheel Drive (AWD) to deliver equal power across all 4 massive wheels
         flCollider.motorTorque = verticalInput * motorForce;
         frCollider.motorTorque = verticalInput * motorForce;
+        rlCollider.motorTorque = verticalInput * motorForce;
+        rrCollider.motorTorque = verticalInput * motorForce;
 
         currentBrakeForce = isBraking ? brakeForce : 0f;
         ApplyBraking();
