@@ -634,7 +634,7 @@ GameObject:
   - component: {fileID: 581180473}
   m_Layer: 3
   m_Name: Battery (1)
-  m_TagString: Battery
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -766,7 +766,7 @@ GameObject:
   - component: {fileID: 658785541}
   m_Layer: 3
   m_Name: Battery
-  m_TagString: Battery
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

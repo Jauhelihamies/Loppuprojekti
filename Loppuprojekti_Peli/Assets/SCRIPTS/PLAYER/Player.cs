@@ -364,9 +364,23 @@ public class Player : MonoBehaviour
         }
     }
 
-    public InventoryItemData? GetItemWithItemName(string tag)
+    /// <summary>
+    /// Palauttaa tietyn k‰dess‰ olevan itemin (jolla on sama itemName.)
+    /// </summary>
+    /// <param name="name">Mink‰ itemin haluaa. InventoryItemData itemName pit‰‰ nimet‰ samaksi.</param>
+    /// <returns></returns>
+    public InventoryItemData? GetItemWithItemName(string name)
     {
-        foreach (InventoryItemData item in inventory)
+        InventoryItemData item = inventory[currentSlot];
+        if (item != null && item.itemName == name)
+        {
+            //tyhjenn‰ se kohta inventorysta
+            inventory[currentSlot] = null;
+            UpdateInventoryUI();
+            return item;
+        }
+        return null;
+        /*foreach (InventoryItemData item in inventory)
         {
             if (item!= null && item.itemName == tag)
             {
@@ -374,8 +388,7 @@ public class Player : MonoBehaviour
                 UpdateInventoryUI();
                 return item;
             }
-        }
-        return null;
+        }*/
     }
     private void SwitchSlot(int newSlot)
     {
