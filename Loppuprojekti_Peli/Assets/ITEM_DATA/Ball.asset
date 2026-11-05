@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf8beaf12327e1042af2b39addb51aba, type: 3}
+  m_Name: Ball
+  m_EditorClassIdentifier: Assembly-CSharp::ShowImageItemData
+  itemName: Esineen Nimi
+  itemIcon: {fileID: 21300000, guid: fa7f501df97bde746ad03b58e176ef6c, type: 3}
+  useSound: {fileID: 0}
+  prefabToSpawn: {fileID: 5244068441180847998, guid: 6f2c8243a608086499ce75d4ec74cada, type: 3}
+  spawnOffset: {x: 0, y: 1, z: 2}
