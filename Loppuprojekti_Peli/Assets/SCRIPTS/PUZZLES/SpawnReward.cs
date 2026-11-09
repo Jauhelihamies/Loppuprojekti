@@ -2,19 +2,10 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    public static Spawner Instance { get; private set; }
-
     [SerializeField] private GameObject prefabToSpawn; // Vedä prefabi tähän
     [SerializeField] private Transform spawnPoint;     // Vedä tyhjä GameObject tähän Inspectorissa
 
-    private void Awake()
-    {
-        if (Instance == null) { Instance = this; }
-        else { Destroy(gameObject); }
-    }
-
-    // Tätä kutsutaan muualta ilman parametreja
-    public void SpawnAtEmptyObject()
+    public void SpawnReward()
     {
         if (prefabToSpawn != null && spawnPoint != null)
         {
