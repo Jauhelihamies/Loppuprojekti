@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class KenttaVaihdaSuunta : MonoBehaviour
@@ -25,16 +26,23 @@ public class KenttaVaihdaSuunta : MonoBehaviour
     /// </summary>
     public void CloseAndOpenMove()
     {
+        //katsoo onko kiinni
         if (!open)
         {
+            //avaa oven
+            open = true;
+
             gameObject.transform.position = new Vector3(
                 gameObject.transform.position.x, 
                 gameObject.transform.position.y + 1f,
                 gameObject.transform.position.z);
-
-            open = true;
-        } else
+        }
+        //katsoo onko auki
+        else
         {
+            //sulkee oven
+            open = false;
+
             gameObject.transform.position = oldPosition;
         }
     }

@@ -640,7 +640,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 188145486}
         m_TargetAssemblyTypeName: KenttaVaihdaSuunta, Assembly-CSharp
-        m_MethodName: TurnPiece
+        m_MethodName: CloseAndOpenMove
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
