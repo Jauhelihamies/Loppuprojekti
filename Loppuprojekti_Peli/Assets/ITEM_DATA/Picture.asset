@@ -15,5 +15,5 @@ MonoBehaviour:
   itemName: Picture
   itemIcon: {fileID: 21300000, guid: 5ce10cb4eed913249a857c920bf82135, type: 3}
   useSound: {fileID: 0}
-  prefabToSpawn: {fileID: 0}
+  prefabToSpawn: {fileID: 6927784118757206645, guid: 8942b6af1fd9ad64d9b81d0227b3be51, type: 3}
   spawnOffset: {x: 0, y: 0.5, z: 1}
