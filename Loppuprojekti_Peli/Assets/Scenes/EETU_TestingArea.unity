@@ -1694,6 +1694,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BloodyHellRacer
       objectReference: {fileID: 0}
+    - target: {fileID: 9125275543879841108, guid: 6888eace98d20cd4ea2991ffc278ca39, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
