@@ -1,11 +1,14 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.InputSystem; // New Input System namespace
+using UnityEngine.InputSystem;
 
 public class BowlingSystemNew : MonoBehaviour
 {
     public enum BowlingState { Aiming, Charging, Rolling }
     private BowlingState currentState;
+
+    
+    public BowlingState CurrentState => currentState;
 
     [Header("Aiming Settings")]
     [SerializeField] private float rotationSpeed = 45f;
@@ -18,6 +21,10 @@ public class BowlingSystemNew : MonoBehaviour
     [SerializeField] private float chargeSpeed = 1.5f;
     [SerializeField] private Slider powerBarSlider;
 
+    [Header("Timing Settings")]
+    [Tooltip("How long to wait after hitting the pit trigger before the game resets. Lower this value for faster resets!")]
+    [SerializeField] private float resetDelayTime = 1.2f;
+
     private Rigidbody rb;
     private float currentForce;
     private bool chargingUp = true;
@@ -25,7 +32,6 @@ public class BowlingSystemNew : MonoBehaviour
     private Vector3 initialPosition;
     private float currentAimAngle = 0f;
     private BowlingInteraction interactionController;
-    private bool hasTriggeredReset = false;
 
     private void Awake()
     {
@@ -40,12 +46,12 @@ public class BowlingSystemNew : MonoBehaviour
     public void InitializeBowling(BowlingInteraction controller)
     {
         interactionController = controller;
-        hasTriggeredReset = false;
 
-        // Reset the ball's location and stop its physical movement
-        rb.isKinematic = true;
+        
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = true;
+
         transform.position = initialPosition;
         transform.rotation = initialRotation;
 
@@ -142,16 +148,12 @@ public class BowlingSystemNew : MonoBehaviour
         rb.AddForce(transform.forward * currentForce, ForceMode.Impulse);
     }
 
-    // Automatically detects when the ball drops into the pin gutter/pit
     private void OnTriggerEnter(Collider other)
     {
-        // Make sure the pit trigger GameObject is named exactly "PitTrigger" (or change this string)
-        if (other.gameObject.name == "PitTrigger" && !hasTriggeredReset)
+        if (other.gameObject.name == "PitTrigger" || other.CompareTag("PitTrigger"))
         {
-            hasTriggeredReset = true;
-
-            // Wait 3 seconds so the user can watch the pins crash before resetting
-            Invoke(nameof(CallReset), 3f);
+            CancelInvoke(nameof(CallReset));
+            Invoke(nameof(CallReset), resetDelayTime);
         }
     }
 

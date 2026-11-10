@@ -1,30 +1,53 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using System.Collections;
 
 public class BowlingInteraction : MonoBehaviour
 {
     [Header("Setup")]
-    [SerializeField] private MonoBehaviour playerMovementScript; // Drag your player movement script here
-    [SerializeField] private Camera mainPlayerCamera;            // Your regular player camera
-    [SerializeField] private Camera bowlingCamera;               // The camera facing the lane
-    [SerializeField] private BowlingSystemNew bowlingSystemScript;   // Drag the bowling ball script here
+    [SerializeField] private MonoBehaviour playerMovementScript;
+    [SerializeField] private Camera mainPlayerCamera;
+    [SerializeField] private Camera bowlingCamera;
+    [SerializeField] private BowlingSystemNew bowlingSystemScript;
 
-    [Header("Pin Reset Configuration")]
-    [SerializeField] private List<GameObject> pinObjects;        // Drag all 10 pin GameObjects here
+    [Header("Pin Configuration")]
+    [SerializeField] private List<GameObject> pinObjects;
+
+    [Header("UI Image Feedback")]
+    [SerializeField] private Image displayImageHolder;
+    [SerializeField] private float imageDisplayDuration = 2.5f;
+
+    [Header("Animation Settings")]
+    [SerializeField] private float popInSpeed = 10f;
+    [SerializeField] private float fadeOutSpeed = 2f;
+
+    [Header("Sprite Assets (Pictures)")]
+    [SerializeField] private Sprite gutterballSprite;
+    [SerializeField] private Sprite strikeSprite;
+    [SerializeField] private Sprite clearSprite;
+
+    [Tooltip("Add 10 elements here. Element 0 = 1-Count, Element 9 = 10-Count")]
+    [SerializeField] private List<Sprite> countSprites;
 
     private List<Vector3> initialPinPositions = new List<Vector3>();
     private List<Quaternion> initialPinRotations = new List<Quaternion>();
 
     private bool isPlayerNear = false;
     private bool isBowling = false;
+    private int currentTurnCount = 0;
+    private const int maxTurnsPerFrame = 3;
+
+    private Coroutine activeAnimationCoroutine;
 
     private void Start()
     {
-        // Ensure bowling system starts turned off
         if (bowlingSystemScript != null) bowlingSystemScript.enabled = false;
         if (bowlingCamera != null) bowlingCamera.enabled = false;
 
-        // Save the starting positions and rotations of all pins so we can reset them perfectly
+        if (displayImageHolder != null) displayImageHolder.gameObject.SetActive(false);
+
         foreach (GameObject pin in pinObjects)
         {
             if (pin != null)
@@ -37,25 +60,28 @@ public class BowlingInteraction : MonoBehaviour
 
     private void Update()
     {
-        // Using the New Input System keyboard check for the 'E' key
-        if (isPlayerNear && !isBowling && UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.eKey.wasPressedThisFrame)
+        if (isPlayerNear && !isBowling && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
             StartBowling();
+        }
+
+        if (isBowling && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            StopBowling();
         }
     }
 
     public void StartBowling()
     {
         isBowling = true;
+        currentTurnCount = 0;
 
-        // 1. Disable player movement so they can't walk away
         if (playerMovementScript != null) playerMovementScript.enabled = false;
-
-        // 2. Swap cameras to look at the lane
         if (mainPlayerCamera != null) mainPlayerCamera.enabled = false;
         if (bowlingCamera != null) bowlingCamera.enabled = true;
 
-        // 3. Enable the throwing/aiming system
+        ResetAllTenPins();
+
         if (bowlingSystemScript != null)
         {
             bowlingSystemScript.enabled = true;
@@ -67,57 +93,193 @@ public class BowlingInteraction : MonoBehaviour
     {
         isBowling = false;
 
+        if (activeAnimationCoroutine != null) StopCoroutine(activeAnimationCoroutine);
+        if (displayImageHolder != null) displayImageHolder.gameObject.SetActive(false);
+
         if (playerMovementScript != null) playerMovementScript.enabled = true;
         if (mainPlayerCamera != null) mainPlayerCamera.enabled = true;
         if (bowlingCamera != null) bowlingCamera.enabled = false;
         if (bowlingSystemScript != null) bowlingSystemScript.enabled = false;
     }
 
-    // Call this to count the standing pins and reset the lane for a new turn
     public void EndTurnAndReset()
     {
-        int knockedPins = 0;
+        currentTurnCount++;
 
+        int totalKnockedThisThrow = 0;
+        int totalRemainingStandingOnDeck = 0;
+
+        // One clean pass to check pin states
         for (int i = 0; i < pinObjects.Count; i++)
         {
             if (pinObjects[i] == null) continue;
+            if (!pinObjects[i].activeSelf) continue;
 
-            // Check if the pin is knocked over by measuring its tilt (angle relative to upright Vector3.up)
             float angle = Quaternion.Angle(pinObjects[i].transform.rotation, initialPinRotations[i]);
 
-            // If it's tilted more than 10 degrees, it counts as knocked down
             if (angle > 10f)
             {
-                knockedPins++;
+                totalKnockedThisThrow++;
+                pinObjects[i].SetActive(false);
             }
-
-            // Reset the pin's position, rotation, and physics states
-            Rigidbody pinRb = pinObjects[i].GetComponent<Rigidbody>();
-            if (pinRb != null)
+            else
             {
-                pinRb.linearVelocity = Vector3.zero;
-                pinRb.angularVelocity = Vector3.zero;
+                totalRemainingStandingOnDeck++;
+
+                Rigidbody pinRb = pinObjects[i].GetComponent<Rigidbody>();
+                if (pinRb != null)
+                {
+                    pinRb.linearVelocity = Vector3.zero;
+                    pinRb.angularVelocity = Vector3.zero;
+                    pinRb.Sleep();
+                }
+
+                pinObjects[i].transform.position = initialPinPositions[i];
+                pinObjects[i].transform.rotation = initialPinRotations[i];
             }
-            pinObjects[i].transform.position = initialPinPositions[i];
-            pinObjects[i].transform.rotation = initialPinRotations[i];
         }
 
-        Debug.Log($"🎳 Turn complete! You knocked down {knockedPins} out of {pinObjects.Count} pins!");
+        DisplayImageReaction(totalKnockedThisThrow, totalRemainingStandingOnDeck == 0);
 
-        // Put the player right back into the aiming screen for the next throw
+        if (totalRemainingStandingOnDeck == 0)
+        {
+            ResetAllTenPins();
+            currentTurnCount = 0;
+        }
+        else if (currentTurnCount >= maxTurnsPerFrame)
+        {
+            ResetAllTenPins();
+            currentTurnCount = 0;
+        }
+
         if (isBowling && bowlingSystemScript != null)
         {
             bowlingSystemScript.InitializeBowling(this);
         }
     }
 
+    private void DisplayImageReaction(int knockedCount, bool allCleared)
+    {
+        if (displayImageHolder == null) return;
+
+        if (activeAnimationCoroutine != null)
+        {
+            StopCoroutine(activeAnimationCoroutine);
+        }
+
+        Sprite selectedSprite = null;
+
+        if (knockedCount == 0)
+        {
+            selectedSprite = gutterballSprite;
+        }
+        else if (allCleared && currentTurnCount == 1)
+        {
+            selectedSprite = strikeSprite;
+        }
+        else if (allCleared)
+        {
+            selectedSprite = clearSprite;
+        }
+        else
+        {
+            int spriteIndex = knockedCount - 1;
+            if (countSprites != null && spriteIndex >= 0 && spriteIndex < countSprites.Count)
+            {
+                selectedSprite = countSprites[spriteIndex];
+            }
+        }
+
+        if (selectedSprite != null)
+        {
+            displayImageHolder.sprite = selectedSprite;
+            activeAnimationCoroutine = StartCoroutine(JuicyImageAnimationRoutine());
+        }
+        else
+        {
+            displayImageHolder.gameObject.SetActive(false);
+        }
+    }
+
+    private IEnumerator JuicyImageAnimationRoutine()
+    {
+        displayImageHolder.gameObject.SetActive(true);
+
+        Color imgColor = displayImageHolder.color;
+        imgColor.a = 1f;
+        displayImageHolder.color = imgColor;
+        displayImageHolder.transform.localScale = Vector3.zero;
+
+        float timer = 0f;
+        Vector3 finalNaturalScale = new Vector3(4f, 4f, 4f);
+        Vector3 targetPopScale = new Vector3(5.2f, 5.2f, 5.2f);
+
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime * popInSpeed;
+            displayImageHolder.transform.localScale = Vector3.Lerp(Vector3.zero, targetPopScale, timer);
+            yield return null;
+        }
+
+        timer = 0f;
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime * (popInSpeed * 1.5f);
+            displayImageHolder.transform.localScale = Vector3.Lerp(targetPopScale, finalNaturalScale, timer);
+            yield return null;
+        }
+        displayImageHolder.transform.localScale = finalNaturalScale;
+
+        yield return new WaitForSeconds(imageDisplayDuration);
+
+        timer = 0f;
+        Vector3 startingScale = displayImageHolder.transform.localScale;
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime * fadeOutSpeed;
+            imgColor.a = Mathf.Lerp(1f, 0f, timer);
+            displayImageHolder.color = imgColor;
+            displayImageHolder.transform.localScale = Vector3.Lerp(startingScale, finalNaturalScale * 0.8f, timer);
+            yield return null;
+        }
+
+        displayImageHolder.gameObject.SetActive(false);
+    }
+
+    private void ResetAllTenPins()
+    {
+        for (int i = 0; i < pinObjects.Count; i++)
+        {
+            if (pinObjects[i] == null) continue;
+
+            pinObjects[i].SetActive(true);
+
+            Rigidbody pinRb = pinObjects[i].GetComponent<Rigidbody>();
+            if (pinRb != null)
+            {
+                pinRb.linearVelocity = Vector3.zero;
+                pinRb.angularVelocity = Vector3.zero;
+                pinRb.Sleep();
+            }
+
+            pinObjects[i].transform.position = initialPinPositions[i];
+            pinObjects[i].transform.rotation = initialPinRotations[i];
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")) isPlayerNear = true;
+        if (other.CompareTag("Player"))
+        {
+            isPlayerNear = true;
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player")) isPlayerNear = false;
+        if (other.CompareTag("Player"))
+        {
+            isPlayerNear = false;
+        }
     }
 }
