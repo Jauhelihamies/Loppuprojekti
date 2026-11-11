@@ -360,7 +360,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            Debug.Log("K‰si on tyhj‰, ei mit‰‰n k‰ytett‰v‰‰.");
+     
         }
     }
 
@@ -394,7 +394,7 @@ public class Player : MonoBehaviour
     {
         currentSlot = newSlot;
         string currentItemName = inventory[currentSlot] != null ? inventory[currentSlot].itemName : "Tyhj‰";
-        Debug.Log($"Vaihdettu paikkaan {currentSlot + 1}. K‰dess‰: {currentItemName}");
+
         UpdateInventoryUI();
     }
     private void HandleMouseLook()

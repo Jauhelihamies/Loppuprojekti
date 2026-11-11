@@ -11,6 +11,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MillaScene.unity
     guid: 1a2f9fe354346994b9e852ca66cb0b3b
+  - enabled: 1
+    path: Assets/Scenes/WinScreen.unity
+    guid: d51b320821338974982fc245f8a38299
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: bc7b058b8908d194ab179cb6915ce1f2
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

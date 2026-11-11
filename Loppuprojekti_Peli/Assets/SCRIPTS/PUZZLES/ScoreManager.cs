@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ScoreCollector : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class ScoreCollector : MonoBehaviour
     // Tämä julkinen muuttuja sallii oven tarkistaa tilanteen
     public bool OnVoitettu { get; private set; } = false;
 
+
     private void OnTriggerEnter(Collider other)
     {
         if (OnVoitettu) return;
@@ -18,14 +20,14 @@ public class ScoreCollector : MonoBehaviour
         if (other.CompareTag(palloTag))
         {
             keratytPallot++;
-            Debug.Log($"Pallo kerätty! Kasassa: {keratytPallot} / {tarvittavatPallot}");
 
             Destroy(other.gameObject);
 
             if (keratytPallot >= tarvittavatPallot)
             {
                 OnVoitettu = true;
-                Debug.Log("Tavoite saavutettu! Ovi voidaan nyt avata.");
+
+
             }
         }
     }

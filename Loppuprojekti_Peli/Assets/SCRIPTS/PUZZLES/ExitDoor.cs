@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(AudioSource))] // Varmistaa, ett‰ objektissa on AudioSource-komponentti
 public class ExitDoorController : MonoBehaviour
@@ -27,6 +28,8 @@ public class ExitDoorController : MonoBehaviour
     private bool onkoKaynnissa = false;
     private bool oviOnAuki = false;
 
+    public UnityEvent GameHasBeenWon;
+    public UnityEvent GameHasBeenWon2;
     private void Awake()
     {
         // Haetaan AudioSource-komponentti talteen
@@ -43,6 +46,9 @@ public class ExitDoorController : MonoBehaviour
             // Soitetaan onnistumis‰‰ni
             ToistaAani(onnistuiAani);
             StartCoroutine(AvaaOviAnimaatio());
+            GameHasBeenWon.Invoke();
+            GameHasBeenWon2.Invoke();
+
         }
         else
         {

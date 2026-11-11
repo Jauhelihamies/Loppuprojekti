@@ -41,7 +41,7 @@ Material:
     m_Floats:
     - _Fresnel_Power: 0.14
     - _QueueControl: 0
-    - _Smoothness: 0.98
+    - _Smoothness: 0.2
     m_Colors:
     - _BaseColor: {r: 0, g: 0.13356209, b: 1, a: 1}
     - _GlowColor: {r: 0.48113203, g: 0.9410378, b: 1, a: 1}

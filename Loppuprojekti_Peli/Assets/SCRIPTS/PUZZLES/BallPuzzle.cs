@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class BallMachine : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class BallMachine : MonoBehaviour
     public Transform springTransform;
     public Vector3 springRotationAxis = new Vector3(0, 1, 0);
     public float springRotationDegrees = 180f;
+
+    // get reward
+    public UnityEvent onBallPuzzleSolved;
 
     [Header("Spawner & Hissi asetukset")]
     [Tooltip("Lista pallojen Prefabeista. Kone käy nämä läpi järjestyksessä kerran ja lopettaa toiminnan.")]
@@ -77,6 +81,7 @@ public class BallMachine : MonoBehaviour
         {
             isFinished = true;
             Debug.Log("BallMachine: Kaikki listan pallot on nyt laukaistu kerran. Kone sammutettu.");
+            onBallPuzzleSolved.Invoke();
         }
 
         // Varmistetaan vielä, ettei listan kyseinen alkio ole tyhjä (null)
