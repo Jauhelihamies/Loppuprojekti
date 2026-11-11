@@ -7,7 +7,6 @@ public class BowlingSystemNew : MonoBehaviour
     public enum BowlingState { Aiming, Charging, Rolling }
     private BowlingState currentState;
 
-    
     public BowlingState CurrentState => currentState;
 
     [Header("Aiming Settings")]
@@ -47,13 +46,24 @@ public class BowlingSystemNew : MonoBehaviour
     {
         interactionController = controller;
 
-        
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        rb.isKinematic = true;
+        // 1. Reset velocities ONLY while the Rigidbody is non-kinematic
+        if (rb != null)
+        {
+            if (!rb.isKinematic)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+            rb.isKinematic = true;
+        }
 
-        transform.position = initialPosition;
-        transform.rotation = initialRotation;
+        // 2. Sync Transform and Rigidbody position/rotation
+        transform.SetPositionAndRotation(initialPosition, initialRotation);
+        if (rb != null)
+        {
+            rb.position = initialPosition;
+            rb.rotation = initialRotation;
+        }
 
         currentState = BowlingState.Aiming;
         currentAimAngle = 0f;
@@ -68,6 +78,9 @@ public class BowlingSystemNew : MonoBehaviour
 
     private void Update()
     {
+        // Prevent input handling if the bowling system hasn't been initialized yet
+        if (interactionController == null) return;
+
         Keyboard keyboard = Keyboard.current;
         if (keyboard == null) return;
 
@@ -141,16 +154,19 @@ public class BowlingSystemNew : MonoBehaviour
     private void ThrowBall()
     {
         currentState = BowlingState.Rolling;
-        rb.isKinematic = false;
+
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.AddForce(transform.forward * currentForce, ForceMode.Impulse);
+        }
 
         if (powerBarSlider != null) powerBarSlider.gameObject.SetActive(false);
-
-        rb.AddForce(transform.forward * currentForce, ForceMode.Impulse);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.name == "PitTrigger" || other.CompareTag("PitTrigger"))
+        if (currentState == BowlingState.Rolling && (other.gameObject.name == "PitTrigger" || other.CompareTag("PitTrigger")))
         {
             CancelInvoke(nameof(CallReset));
             Invoke(nameof(CallReset), resetDelayTime);
