@@ -336,13 +336,12 @@ public class Player : MonoBehaviour
             if (inventory[i] == null)
             {
                 inventory[i] = item;
-                Debug.Log($"Lisätty reppuun paikkaan {i + 1}: {item.itemName}");
+
                 UpdateInventoryUI();
                 return;
             }
         }
         inventory[currentSlot] = item;
-        Debug.Log($"Reppu täynnä! Korvattu kädessä ollut paikka esineellä: {item.itemName}");
         UpdateInventoryUI();
     }
     public void OnSwitchSlot1(InputValue value) { if (value.isPressed) SwitchSlot(0); }
@@ -355,7 +354,6 @@ public class Player : MonoBehaviour
         {
             inventory[currentSlot].UseItem(this);
             inventory[currentSlot] = null;
-            Debug.Log($"Esine käytetty ja kulutettu paikasta {currentSlot + 1}.");
             UpdateInventoryUI();
         }
         else
