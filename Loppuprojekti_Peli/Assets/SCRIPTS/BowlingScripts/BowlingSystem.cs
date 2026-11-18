@@ -6,7 +6,6 @@ public class BowlingSystemNew : MonoBehaviour
 {
     public enum BowlingState { Aiming, Charging, Rolling }
     private BowlingState currentState;
-
     public BowlingState CurrentState => currentState;
 
     [Header("Aiming Settings")]
@@ -76,6 +75,23 @@ public class BowlingSystemNew : MonoBehaviour
         }
     }
 
+    // UUSI METODI: Kutsu tätä BowlingInteraction-skriptistä, kun pelaaja poistuu keilaamisesta
+    public void ExitBowling()
+    {
+        CancelInvoke(nameof(CallReset));
+        interactionController = null;
+
+        if (powerBarSlider != null) powerBarSlider.gameObject.SetActive(false);
+        if (aimArrow != null) aimArrow.SetActive(false);
+    }
+
+    // Varmistaa, että UI piilotetaan myös jos koko GameObject poistetaan käytöstä
+    private void OnDisable()
+    {
+        if (powerBarSlider != null) powerBarSlider.gameObject.SetActive(false);
+        if (aimArrow != null) aimArrow.SetActive(false);
+    }
+
     private void Update()
     {
         // Prevent input handling if the bowling system hasn't been initialized yet
@@ -89,11 +105,9 @@ public class BowlingSystemNew : MonoBehaviour
             case BowlingState.Aiming:
                 HandleAiming(keyboard);
                 break;
-
             case BowlingState.Charging:
                 HandlePowerCharge(keyboard);
                 break;
-
             case BowlingState.Rolling:
                 break;
         }
@@ -107,7 +121,6 @@ public class BowlingSystemNew : MonoBehaviour
 
         currentAimAngle += rotationInput * rotationSpeed * Time.deltaTime;
         currentAimAngle = Mathf.Clamp(currentAimAngle, -maxAimAngle, maxAimAngle);
-
         transform.rotation = initialRotation * Quaternion.Euler(0f, currentAimAngle, 0f);
 
         if (keyboard.spaceKey.wasPressedThisFrame)
@@ -154,7 +167,6 @@ public class BowlingSystemNew : MonoBehaviour
     private void ThrowBall()
     {
         currentState = BowlingState.Rolling;
-
         if (rb != null)
         {
             rb.isKinematic = false;

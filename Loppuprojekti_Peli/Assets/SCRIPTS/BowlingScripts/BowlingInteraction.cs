@@ -99,9 +99,13 @@ public class BowlingInteraction : MonoBehaviour
         if (playerMovementScript != null) playerMovementScript.enabled = true;
         if (mainPlayerCamera != null) mainPlayerCamera.enabled = true;
         if (bowlingCamera != null) bowlingCamera.enabled = false;
-        if (bowlingSystemScript != null) bowlingSystemScript.enabled = false;
-    }
 
+        if (bowlingSystemScript != null)
+        {
+            bowlingSystemScript.ExitBowling(); // Piilottaa sliderin ja tähtäysnuolen
+            bowlingSystemScript.enabled = false;
+        }
+    }
     public void EndTurnAndReset()
     {
         currentTurnCount++;

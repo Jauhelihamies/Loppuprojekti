@@ -3,12 +3,16 @@ using UnityEngine.InputSystem;
 
 public class PhysicsDragAndScroll : MonoBehaviour
 {
-    [Header("Asetukset")]
+    [Header("Raahausasetukset")]
     [SerializeField] private float scrollSpeed = 2f;
     [SerializeField] private float minDistance = 2f;
     [SerializeField] private float maxDistance = 50f;
-    [SerializeField] private float dragForce = 20f; // Kuinka nopeasti objekti seuraa hiirt‰
+    [SerializeField] private float dragForce = 20f;
     [SerializeField] private LayerMask draggableLayer;
+
+    [Header("Palautusasetukset")]
+    [SerializeField] private float minHeight = -15f; // Korkeus, jonka alapuolella objekti palautetaan
+    [SerializeField] private float respawnDistance = 5f; // Et‰isyys kamerasta palautettaessa
 
     private Camera mainCamera;
     private Rigidbody targetRigidbody;
@@ -23,6 +27,9 @@ public class PhysicsDragAndScroll : MonoBehaviour
 
     private void Update()
     {
+        // Tarkistetaan onko yksik‰‰n raahattava objekti pudonnut liian alas
+        CheckOutOfBounds();
+
         Mouse mouse = Mouse.current;
         if (mouse == null) return;
 
@@ -52,22 +59,53 @@ public class PhysicsDragAndScroll : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Fysiikkaliike tehd‰‰n aina FixedUpdate-metodissa
         if (targetRigidbody == null) return;
 
         Mouse mouse = Mouse.current;
         if (mouse == null) return;
 
-        // Lasketaan kohdepiste maailmassa (miss‰ hiiren "pit‰isi" olla)
         Vector2 mousePosition = mouse.position.ReadValue();
         Vector3 screenPosition = new Vector3(mousePosition.x, mousePosition.y, currentDistance);
         Vector3 targetWorldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
 
-        // Lasketaan suunta ja et‰isyys objektista kohdepisteeseen
         Vector3 direction = targetWorldPosition - targetRigidbody.position;
-
-        // Liikutetaan objektia fysiikkavoimalla kohti kohdetta (linearVelocity on uusi ja oikein Unity 6:ssa!)
         targetRigidbody.linearVelocity = direction * dragForce;
+    }
+
+    // Tarkistaa kaikki scenen Rigidbodyt ja palauttaa pudonneet
+    private void CheckOutOfBounds()
+    {
+        Rigidbody[] allRigidbodies = FindObjectsByType<Rigidbody>(FindObjectsSortMode.None);
+
+        foreach (Rigidbody rb in allRigidbodies)
+        {
+            // Tarkistetaan, kuuluuko objekti draggableLayer-tasoon
+            if (((1 << rb.gameObject.layer) & draggableLayer) != 0)
+            {
+                // Jos objekti on pudonnut alle minHeight-rajan
+                if (rb.position.y < minHeight)
+                {
+                    RespawnInFrontOfCamera(rb);
+                }
+            }
+        }
+    }
+
+    // Siirt‰‰ objektin kameran eteen ja nollaa vauhdin
+    private void RespawnInFrontOfCamera(Rigidbody rb)
+    {
+        // Jos pelaaja raahasi t‰t‰ objektia juuri, lopetetaan raahaus ensin
+        if (targetRigidbody == rb)
+        {
+            EndDrag();
+        }
+
+        // Lasketaan sijainti suoraan kameran eteen
+        Vector3 spawnPosition = mainCamera.transform.position + (mainCamera.transform.forward * respawnDistance);
+
+        rb.position = spawnPosition;
+        rb.linearVelocity = Vector3.zero; // Nollataan putoamisnopeus
+        rb.angularVelocity = Vector3.zero; // Nollataan pyˆriminen
     }
 
     private void TryStartDrag(Vector2 mousePosition)
@@ -79,16 +117,13 @@ public class PhysicsDragAndScroll : MonoBehaviour
             if (hit.transform.TryGetComponent<Rigidbody>(out Rigidbody rb))
             {
                 targetRigidbody = rb;
-
-                // KORJATTU: K‰ytet‰‰n .drag-muuttujaa linearDragin sijaan
                 originalDrag = targetRigidbody.linearDamping;
                 originalAngularDrag = targetRigidbody.angularDamping;
 
                 targetRigidbody.useGravity = false;
-                targetRigidbody.linearDamping = 10f; // Est‰‰ liiallisen heilahtelun
+                targetRigidbody.linearDamping = 10f;
                 targetRigidbody.angularDamping = 5f;
 
-                // Lasketaan aloituset‰isyys
                 currentDistance = Vector3.Distance(mainCamera.transform.position, targetRigidbody.position);
             }
         }
@@ -98,12 +133,9 @@ public class PhysicsDragAndScroll : MonoBehaviour
     {
         if (targetRigidbody != null)
         {
-            // Palautetaan objektin alkuper‰iset fysiikka-asetukset
-            // KORJATTU: K‰ytet‰‰n .drag-muuttujaa linearDragin sijaan
             targetRigidbody.useGravity = true;
             targetRigidbody.linearDamping = originalDrag;
             targetRigidbody.angularDamping = originalAngularDrag;
-
             targetRigidbody = null;
         }
     }
