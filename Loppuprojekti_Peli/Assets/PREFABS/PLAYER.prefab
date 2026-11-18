@@ -576,12 +576,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectDragger
   scrollSpeed: 100
-  minDistance: 0.5
+  minDistance: 2
   maxDistance: 8
   dragForce: 15
   draggableLayer:
     serializedVersion: 2
     m_Bits: 64
+  minHeight: -10
+  respawnDistance: 5
 --- !u!1 &6215318904909986594
 GameObject:
   m_ObjectHideFlags: 0
@@ -1123,7 +1125,7 @@ CharacterController:
   m_Height: 2
   m_Radius: 0.5
   m_SlopeLimit: 45
-  m_StepOffset: 0.45
+  m_StepOffset: 0.48
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}

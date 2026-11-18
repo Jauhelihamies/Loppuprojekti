@@ -85,6 +85,6 @@ public class AnimateDoor : MonoBehaviour
 
         // Varmistetaan tasan tarkka lopullinen auki-asento
         transform.localRotation = openRotation;
-        Debug.Log("Ovi on täysin auki kaikilla akseleilla!");
+
     }
 }
